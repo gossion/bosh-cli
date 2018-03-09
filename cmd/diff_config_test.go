@@ -32,10 +32,8 @@ var _ = Describe("DiffConfigCmd", func() {
 
 		BeforeEach(func() {
 			opts = DiffConfigOpts{
-				Args: DiffConfigArgs{
-					FromID: "1",
-					ToID:   "2",
-				},
+				FromID: "1",
+				ToID:   "2",
 			}
 		})
 
