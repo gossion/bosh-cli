@@ -48,6 +48,7 @@ func (s *sshTunnel) Start(readyErrCh chan<- error, errCh chan<- error) {
 		remoteConn, err := s.remoteListener.Accept()
 		s.logger.Debug(s.logTag, "Received connection")
 		if err != nil {
+			s.logger.Warn(s.logTag, "Failed to accept connection: %s", err.Error())
 			errCh <- bosherr.WrapError(err, "Accepting connection on remote server")
 		}
 
@@ -57,10 +58,11 @@ func (s *sshTunnel) Start(readyErrCh chan<- error, errCh chan<- error) {
 			}
 		}()
 
-		s.logger.Debug(s.logTag, "Dialing local server")
 		localDialAddr := fmt.Sprintf("127.0.0.1:%d", s.localForwardPort)
+		s.logger.Debug(s.logTag, "Dialing local server: %s", localDialAddr)
 		localConn, err := net.Dial("tcp", localDialAddr)
 		if err != nil {
+			s.logger.Warn(s.logTag, "Failed to dail local server, will return. Error: %s", err.Error())
 			errCh <- bosherr.WrapError(err, "Dialing local server")
 			return
 		}
@@ -77,6 +79,7 @@ func (s *sshTunnel) Start(readyErrCh chan<- error, errCh chan<- error) {
 			s.logger.Debug(s.logTag, "Copying bytes from local to remote %d", bytesNum)
 
 			if err != nil {
+				s.logger.Warn(s.logTag, "Failed to copy bytes from local to remote. Error: %s", err.Error())
 				errCh <- bosherr.WrapError(err, "Copying bytes from local to remote")
 			}
 		}()
@@ -93,6 +96,7 @@ func (s *sshTunnel) Start(readyErrCh chan<- error, errCh chan<- error) {
 			s.logger.Debug(s.logTag, "Copying bytes from remote to local %d", bytesNum)
 
 			if err != nil {
+				s.logger.Warn(s.logTag, "Failed to copy bytes from remote to local. Error: %s", err.Error())
 				errCh <- bosherr.WrapError(err, "Copying bytes from remote to local")
 			}
 		}()
